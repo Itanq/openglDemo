@@ -8,9 +8,9 @@
 class Clock
 {
 public:
-	int secondAngle;
-	int minuterAngle;
-	int hourAngle;
+	float secondAngle;
+	float minuterAngle;
+	float hourAngle;
 
 	int curSecond;
 	int curMinuter;
@@ -19,6 +19,9 @@ public:
 public:
 	Clock(int h = 0, int m = 0, int s = 0) :curHour(h), curMinuter(m), curSecond(s){}
 	int ClockDisplay(GLFWwindow* window);
+	int DrawHour(GLFWwindow* window, float angle);
+	int DrawMinuter(GLFWwindow* window, float angle);
+	int DrawSecond(GLFWwindow* window, float angle);
 	void Run(GLFWwindow* window,float hAngle,float mAngle,float sAngle);
 };
 
