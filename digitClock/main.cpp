@@ -1,4 +1,5 @@
 #include<cmath>
+#include<windows.h>
 #include<iostream>
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
@@ -51,7 +52,21 @@ int main()
 
 	GLFWwindow* window = InitWindow();
 
-	Clock clock(1, 1, 1);
+	SYSTEMTIME curtime;
+	GetLocalTime(&curtime); // 获取当前时间
+
+	Int curHour = curtime.wHour;
+	Int curMinuter = curtime.wMinute;
+	Int curSecond = curtime.wSecond;
+
+	if (curHour > 12) curHour -= 12;
+	Float secondAngle = curSecond * 6.0f;
+	Float minuterAngle = curMinuter * 6.0f + curSecond * 0.1f;
+	Float hourAngle = curHour * 30.0f + curMinuter * 0.5f;
+
+	//printf("%.3lf,%.3lf,%.3lf\n", hourAngle, minuterAngle, secondAngle);
+	Clock clock(hourAngle,minuterAngle,secondAngle);
+
 	clock.Run(window,0.0,0.0,0.0);
 
 	return 0;

@@ -4,9 +4,14 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 
+#include<glm/glm.hpp>
+#include<glm/gtc/type_ptr.hpp>
+#include<glm/gtc/matrix_transform.hpp>
+
 #include"myclock.h"
 #include"myshader.h"
 
+#define eps 1e-9
 #define PI 3.1415926535
 
 
@@ -14,9 +19,16 @@
 int Clock::ClockDisplay(GLFWwindow* window)
 {
 	const Char* vertexPath = "E:\\openglDemo\\digitClock\\vertexShader.shader";
+	const Char* hour_vertexPath = "E:\\openglDemo\\digitClock\\hour_vertexShader.shader";
+	const Char* minuter_vertexPath = "E:\\openglDemo\\digitClock\\minuter_vertexShader.shader";
+	const Char* second_vertexPath = "E:\\openglDemo\\digitClock\\second_vertexShader.shader";
 	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
 
 	Shader ourShader(vertexPath, fragmentPath);
+	Shader hourShader(hour_vertexPath, fragmentPath);
+	Shader minuterShader(minuter_vertexPath, fragmentPath);
+	Shader secondShader(second_vertexPath, fragmentPath);
+
 
 	// 表盘的圆形数据
 	float R = 0.45f;	// 表盘的半径大小
@@ -136,70 +148,20 @@ int Clock::ClockDisplay(GLFWwindow* window)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	// 时钟指针
-	float hour_vertices[] = {
-		-0.02f,-0.04f,0.0f,
-		 0.02f,-0.04f,0.0f,
-		 0.00f, 0.50f,0.0f
-	};
-
+	
+	// 设置三个时针的数据
 	Uint hour_VAO, hour_VBO;
-	glGenVertexArrays(1, &hour_VAO);
-	glGenBuffers(1, &hour_VBO);
-
-	glBindVertexArray(hour_VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, hour_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(hour_vertices), hour_vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
-
-	// 分钟指针
-	float minute_vertices[] = {
-		-0.02f,-0.06f,0.0f,
-		 0.02f,-0.06f,0.0f,
-		 0.35f, 0.30f,0.0f
-	};
-
 	Uint minute_VAO, minute_VBO;
-	glGenVertexArrays(1, &minute_VAO);
-	glGenBuffers(1, &minute_VBO);
-	
-	glBindVertexArray(minute_VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, minute_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(minute_vertices), minute_vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
-
-	float second_vertices[] = {
-		-0.03f, 0.02f,0.0f,
-		 0.03f,-0.01f,0.0f,
-		-0.30f,-0.21f,0.0f
-	};
-
 	Uint second_VAO, second_VBO;
-	glGenVertexArrays(1, &second_VAO);
-	glGenBuffers(1, &second_VBO);
 
-	glBindVertexArray(second_VAO);
+	SetHour(window, hour_VAO, hour_VBO);
+	SetMinuter(window, minute_VAO,minute_VBO);
+	SetSecond(window, second_VAO, second_VBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, second_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(second_vertices),second_vertices,GL_STATIC_DRAW);
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
 	while (!glfwWindowShouldClose(window))
 	{
+
+		myGetCurrentTime();
 
 		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		glfwPollEvents();
@@ -228,17 +190,35 @@ int Clock::ClockDisplay(GLFWwindow* window)
 		glBindVertexArray(0);
 
 		// 画时钟
+		hourShader.Use();
+		glm::mat4 trans_hour;
+		trans_hour = glm::rotate(trans_hour, -(GLfloat)glm::radians(hourAngle), glm::vec3(0.0f,0.0f,1.0f));
+		Uint trans_hour_Loc = glGetUniformLocation(hourShader.Program, "trans_hour");
+		glUniformMatrix4fv(trans_hour_Loc, 1, GL_FALSE, glm::value_ptr(trans_hour));
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBindVertexArray(hour_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
 
 		// 画分钟
+		minuterShader.Use();
+		glm::mat4 trans_minuter;
+		trans_minuter = glm::rotate(trans_minuter, -(GLfloat)glm::radians(minuterAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+		Uint trans_minuter_Loc = glGetUniformLocation(minuterShader.Program, "trans_minuter");
+		glUniformMatrix4fv(trans_minuter_Loc, 1, GL_FALSE, glm::value_ptr(trans_minuter));
+
 		glBindVertexArray(minute_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
 
 		// 画秒针
+		secondShader.Use();
+		glm::mat4 trans_second;
+		trans_second = glm::rotate(trans_second, -(GLfloat)glm::radians(secondAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+		Uint trans_second_Loc = glGetUniformLocation(secondShader.Program, "trans_second");
+		glUniformMatrix4fv(trans_second_Loc, 1, GL_FALSE, glm::value_ptr(trans_second));
+
 		glBindVertexArray(second_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
@@ -251,20 +231,19 @@ int Clock::ClockDisplay(GLFWwindow* window)
 }
 
 
-int Clock::DrawHour(GLFWwindow* window, float Angle)
+int Clock::SetHour(GLFWwindow* window, Uint &hour_VAO, Uint &hour_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\vertexShader.shader";
+	const Char* vertexPath = "E:\\openglDemo\\digitClock\\hour_vertexShader.shader";
 	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
 
 	Shader ourShader(vertexPath, fragmentPath);
 
 	float hour_vertices[] = {
 		-0.03f, 0.02f,0.0f,
-		 0.03f,-0.01f,0.0f,
-		-0.30f,-0.21f,0.0f
+		-0.03f,-0.02f,0.0f,
+		 0.28f, 0.00f,0.0f
 	};
 
-	Uint hour_VAO, hour_VBO;
 	glGenVertexArrays(1, &hour_VAO);
 	glGenBuffers(1, &hour_VBO);
 
@@ -278,30 +257,12 @@ int Clock::DrawHour(GLFWwindow* window, float Angle)
 
 	glBindVertexArray(0);
 	
-
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		ourShader.Use();
-
-		glBindVertexArray(hour_VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
-
-		glfwSwapBuffers(window);
-	}
-	glfwTerminate();
-
 	return 0;
 }
 
-int Clock::DrawMinuter(GLFWwindow* window, float Angle)
+int Clock::SetMinuter(GLFWwindow* window, Uint &minuter_VAO, Uint &minuter_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\vertexShader.shader";
+	const Char* vertexPath = "E:\\openglDemo\\digitClock\\minuter_vertexShader.shader";
 	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
 
 	Shader ourShader(vertexPath, fragmentPath);
@@ -309,10 +270,9 @@ int Clock::DrawMinuter(GLFWwindow* window, float Angle)
 	float minuter_vertices[] = {
 		-0.02f,-0.04f,0.0f,
 		 0.02f,-0.04f,0.0f,
-		 0.00f, 0.50f,0.0f
+		 0.00f, 0.35f,0.0f
 	};
 
-	Uint minuter_VAO, minuter_VBO;
 	glGenVertexArrays(1, &minuter_VAO);
 	glGenBuffers(1, &minuter_VBO);
 	
@@ -326,40 +286,22 @@ int Clock::DrawMinuter(GLFWwindow* window, float Angle)
 
 	glBindVertexArray(0);
 
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		ourShader.Use();
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glBindVertexArray(minuter_VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
-
-		glfwSwapBuffers(window);
-	}
-	glfwTerminate();
 	return 0;
 }
 
-int Clock::DrawSecond(GLFWwindow* window, float Angle)
+int Clock::SetSecond(GLFWwindow* window, Uint &second_VAO, Uint &second_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\vertexShader.shader";
+	const Char* vertexPath = "E:\\openglDemo\\digitClock\\second_vertexShader.shader";
 	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
 
 	Shader ourShader(vertexPath, fragmentPath);
 
 	float second_vertices[] = {
-		-0.02f,-0.06f,0.0f,
-		 0.02f,-0.06f,0.0f,
-		 0.35f, 0.30f,0.0f
+		-0.04f,-0.04f,0.0f,
+		-0.01f,-0.04f,0.0f,
+		 0.00f, 0.40f,0.0f
 	};
 
-	Uint second_VAO, second_VBO;
 	glGenVertexArrays(1, &second_VAO);
 	glGenBuffers(1, &second_VBO);
 
@@ -372,29 +314,11 @@ int Clock::DrawSecond(GLFWwindow* window, float Angle)
 	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
-
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glBindVertexArray(second_VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
-
-		glfwSwapBuffers(0);
-	}
-
-	glfwTerminate();
 	return 0;
 }
 
-void Clock::Run(GLFWwindow* window, float hAngle,float mAngle,float sAngle)
+int Clock::myGetCurrentTime()
 {
-
 	SYSTEMTIME curtime;
 	GetLocalTime(&curtime); // 获取当前时间
 
@@ -402,11 +326,15 @@ void Clock::Run(GLFWwindow* window, float hAngle,float mAngle,float sAngle)
 	curMinuter = curtime.wMinute;
 	curSecond = curtime.wSecond;
 
-	hourAngle = curHour * 360 / 60.0f;
-	minuterAngle = curMinuter * 360 / 60.0f;
-	hourAngle = (curHour % 12) * 360 / 12.0f + curMinuter * 360 / 12.0 / 60 / 0;
+	if (curHour > 12) curHour -= 12;
+	secondAngle = curSecond * 6.0f;
+	minuterAngle = curMinuter * 6.0f + curSecond * 0.1f;
+	hourAngle = curHour * 30.0f + curMinuter * 0.5f;
 
-	//DrawHour(window, hourAngle);
+	return 1;
+}
+
+void Clock::Run(GLFWwindow* window, float hAngle,float mAngle,float sAngle)
+{
 	ClockDisplay(window);
-
 }
