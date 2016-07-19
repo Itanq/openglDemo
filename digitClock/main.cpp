@@ -65,7 +65,7 @@ int main()
 	Float hourAngle = curHour * 30.0f + curMinuter * 0.5f;
 
 	//printf("%.3lf,%.3lf,%.3lf\n", hourAngle, minuterAngle, secondAngle);
-	Clock clock(hourAngle,minuterAngle,secondAngle);
+	Clock clock(360.0-hourAngle,360.0-minuterAngle,360.0-secondAngle);
 
 	clock.Run(window,0.0,0.0,0.0);
 

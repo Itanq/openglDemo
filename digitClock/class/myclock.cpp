@@ -23,11 +23,14 @@ int Clock::ClockDisplay(GLFWwindow* window)
 	const Char* minuter_vertexPath = "E:\\openglDemo\\digitClock\\minuter_vertexShader.shader";
 	const Char* second_vertexPath = "E:\\openglDemo\\digitClock\\second_vertexShader.shader";
 	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
+	const Char* hour_fragmentPath = "E:\\openglDemo\\digitClock\\hour_fragmentShader.shader";
+	const Char* minuter_fragmentPath = "E:\\openglDemo\\digitClock\\minuter_fragmentShader.shader";
+	const Char* second_fragmentPath = "E:\\openglDemo\\digitClock\\second_fragmentShader.shader";
 
 	Shader ourShader(vertexPath, fragmentPath);
-	Shader hourShader(hour_vertexPath, fragmentPath);
-	Shader minuterShader(minuter_vertexPath, fragmentPath);
-	Shader secondShader(second_vertexPath, fragmentPath);
+	Shader hourShader(hour_vertexPath, hour_fragmentPath);
+	Shader minuterShader(minuter_vertexPath, minuter_fragmentPath);
+	Shader secondShader(second_vertexPath, second_fragmentPath);
 
 
 	// 表盘的圆形数据
@@ -192,7 +195,7 @@ int Clock::ClockDisplay(GLFWwindow* window)
 		// 画时钟
 		hourShader.Use();
 		glm::mat4 trans_hour;
-		trans_hour = glm::rotate(trans_hour, -(GLfloat)glm::radians(hourAngle), glm::vec3(0.0f,0.0f,1.0f));
+		trans_hour = glm::rotate(trans_hour, (GLfloat)glm::radians(hourAngle), glm::vec3(0.0f,0.0f,1.0f));
 		Uint trans_hour_Loc = glGetUniformLocation(hourShader.Program, "trans_hour");
 		glUniformMatrix4fv(trans_hour_Loc, 1, GL_FALSE, glm::value_ptr(trans_hour));
 
@@ -233,10 +236,6 @@ int Clock::ClockDisplay(GLFWwindow* window)
 
 int Clock::SetHour(GLFWwindow* window, Uint &hour_VAO, Uint &hour_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\hour_vertexShader.shader";
-	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
-
-	Shader ourShader(vertexPath, fragmentPath);
 
 	float hour_vertices[] = {
 		-0.03f, 0.02f,0.0f,
@@ -262,11 +261,6 @@ int Clock::SetHour(GLFWwindow* window, Uint &hour_VAO, Uint &hour_VBO)
 
 int Clock::SetMinuter(GLFWwindow* window, Uint &minuter_VAO, Uint &minuter_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\minuter_vertexShader.shader";
-	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
-
-	Shader ourShader(vertexPath, fragmentPath);
-
 	float minuter_vertices[] = {
 		-0.02f,-0.04f,0.0f,
 		 0.02f,-0.04f,0.0f,
@@ -291,11 +285,6 @@ int Clock::SetMinuter(GLFWwindow* window, Uint &minuter_VAO, Uint &minuter_VBO)
 
 int Clock::SetSecond(GLFWwindow* window, Uint &second_VAO, Uint &second_VBO)
 {
-	const Char* vertexPath = "E:\\openglDemo\\digitClock\\second_vertexShader.shader";
-	const Char* fragmentPath = "E:\\openglDemo\\digitClock\\fragmentShader.shader";
-
-	Shader ourShader(vertexPath, fragmentPath);
-
 	float second_vertices[] = {
 		-0.04f,-0.04f,0.0f,
 		-0.01f,-0.04f,0.0f,
