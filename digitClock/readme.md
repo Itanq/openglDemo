@@ -10,3 +10,9 @@
 
 ### 效果
 ![clock](https://dn-coding-net-production-pp.qbox.me/d0844476-4f2c-4106-bdad-1faa99c9fab7.png)
+
+
+
+修复了一些小bug,并且增加了三个像素着色器给不同的时针上不同的颜色,更好区分...
+如下图:
+![Clock1](https://img3.doubanio.com/view/photo/photo/public/p2367625911.jpg)
