@@ -195,7 +195,7 @@ int Clock::ClockDisplay(GLFWwindow* window)
 		// 画时钟
 		hourShader.Use();
 		glm::mat4 trans_hour;
-		trans_hour = glm::rotate(trans_hour, (GLfloat)glm::radians(hourAngle), glm::vec3(0.0f,0.0f,1.0f));
+		trans_hour = glm::rotate(trans_hour, -(GLfloat)glm::radians(hourAngle), glm::vec3(0.0f,0.0f,1.0f));
 		Uint trans_hour_Loc = glGetUniformLocation(hourShader.Program, "trans_hour");
 		glUniformMatrix4fv(trans_hour_Loc, 1, GL_FALSE, glm::value_ptr(trans_hour));
 
