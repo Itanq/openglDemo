@@ -1,0 +1,8 @@
+﻿  main.cpp
+e:\opengldemo\solar_system\solar_system\main.cpp(66): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\solar_system\solar_system\main.cpp(67): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\solar_system\solar_system\main.cpp(82): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\solar_system\solar_system\main.cpp(83): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\solar_system\solar_system\main.cpp(103): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+LINK : warning LNK4098: 默认库“MSVCRT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
+  Solar_System.vcxproj -> E:\openglDemo\Solar_System\Debug\Solar_System.exe
