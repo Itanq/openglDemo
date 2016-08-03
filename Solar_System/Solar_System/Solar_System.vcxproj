@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="solarSystem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

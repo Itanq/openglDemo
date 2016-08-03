@@ -1,5 +1,4 @@
-
-#include<cmath>
+Ôªø#include<cmath>
 #include<iostream>
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
@@ -22,13 +21,72 @@ typedef GLfloat Float;
 
 Uint WIDTH = 800, HEIGHT = 600;
 
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+GLfloat sphereData[8024];
+GLfloat circleData[2048];
+
+char keys[1024];
+GLboolean firstMouse = true;
+
+GLfloat lastX=400,lastY=300;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
 void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-
+	if (action == GLFW_PRESS)
+		keys[key] = GL_TRUE;
+	else if(action==GLFW_RELEASE)
+		keys[key] = GL_FALSE;
+}
+void Domovement()
+{
+	if (keys[GLFW_KEY_W])
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (keys[GLFW_KEY_S])
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (keys[GLFW_KEY_A])
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (keys[GLFW_KEY_D])
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+void mousecallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	GLfloat xoffset = xpos - lastX;
+	GLfloat yoffset = lastY - ypos;
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+void scrollcallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera.ProcessMouseScroll(xoffset);
 }
 
+GLuint loadTexture(const char* path)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	int width, height;
+	unsigned char* image = SOIL_load_image(path, &width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	return textureID;
+}
 GLFWwindow* InitWindow()
 {
 	glfwInit();
@@ -41,6 +99,10 @@ GLFWwindow* InitWindow()
 	glfwMakeContextCurrent(window);
 
 	glfwSetKeyCallback(window, keyboard);
+	//glfwSetCursorPosCallback(window, mousecallback);
+	glfwSetScrollCallback(window, scrollcallback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -52,8 +114,6 @@ GLFWwindow* InitWindow()
 	return window;
 }
 
-GLfloat sphereData[8024];
-GLfloat circleData[2048];
 
 int GenerateSphere()
 {
@@ -114,16 +174,16 @@ int main()
 {
 	GLFWwindow* window = InitWindow();
 
-	const char* sphereVertexPath = "E:\\OpenGL\\OpenGL_test1\\OpenGL_test1\\vertexShader.glsl";
-	const char* sphereFragmentPath = "E:\\OpenGL\\OpenGL_test1\\OpenGL_test1\\fragmentShader.glsl";
+	const char* sphereVertexPath = "./Shader/vertexShader.glsl";
+	const char* sphereFragmentPath = "./Shader/fragmentShader.glsl";
 
-	const char* circleVertexPath = "E:\\OpenGL\\OpenGL_test1\\OpenGL_test1\\circleVertexShader.glsl";
+	const char* circleVertexPath = "./Shader/circleVertexShader.glsl";
 
 	Shader sphereShader(sphereVertexPath, sphereFragmentPath);
 	Shader circleShader(circleVertexPath, sphereFragmentPath);
 
-	int sphereCount = GenerateSphere(); // «ÚÃÂ ˝æ›
-	int circleCount = GenerateCircle(); //‘≤–Œ ˝æ›
+	int sphereCount = GenerateSphere(); // ÁêÉ‰Ωì
+	int circleCount = GenerateCircle(); // ÂúÜ
 
 	GLuint sphereVAO, sphereVBO;
 	glGenVertexArrays(1, &sphereVAO);
@@ -153,6 +213,8 @@ int main()
 
 	glBindVertexArray(0);
 
+	GLuint texture = loadTexture("metal.png");
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -164,6 +226,7 @@ int main()
 		circleShader.Use();
 
 		glBindVertexArray(circleVAO);
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glDrawArrays(GL_LINES, 0, circleCount);
 		glBindVertexArray(0);
 
@@ -177,9 +240,9 @@ int main()
 		model = glm::mat4();
 		view = glm::mat4();
 		projection = glm::mat4();
-
-		model = glm::scale(model, glm::vec3(0.55f));
-		model = glm::rotate(model, (GLfloat)glm::radians(glfwGetTime()*45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.45f));
+		model = glm::rotate(model, (GLfloat)glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, (GLfloat)glm::radians(glfwGetTime()*45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 		glDrawArrays(GL_LINES, 0, sphereCount);
@@ -193,18 +256,14 @@ int main()
 
 		model = glm::translate(model, glm::vec3(x, y, 0.0f));
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-
+		model = glm::rotate(model, (GLfloat)glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, (GLfloat)glm::radians(glfwGetTime()*65.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-
+		view = camera.GetViewMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-
-		view = glm::mat4();
-		view = glm::lookAt(glm::vec3(0, 0, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
 		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		projection = glm::mat4();
-		projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+		projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 		glDrawArrays(GL_LINES, 0, sphereCount);

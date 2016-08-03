@@ -14,6 +14,7 @@ class Shader
 {
 public:
 	GLuint Program;
+	Shader(){}
 	Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 	{
 		string vertexCode;
