@@ -27,6 +27,9 @@ const glm::vec2 PLAYER_SIZE(100, 20);
 // Initial velocity of the player paddle
 const GLfloat PLAYER_VELOCITY(500.0f);
 
+const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
+const GLfloat BALL_RADIUS = 12.5f;
+
 // Game holds all game-related state and functionality.
 // Combines all game-related data into a single class for
 // easy access to each of the components and manageability.
@@ -48,6 +51,8 @@ public:
     void ProcessInput(GLfloat dt);
     void Update(GLfloat dt);
     void Render();
+
+	void DoCollisions();
 };
 
 #endif

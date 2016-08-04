@@ -10,16 +10,12 @@
 #include "resourcemanager.h"
 #include "spriterenderer.h"
 #include "gameobject.h"
-
+#include"ballobject.h"
 
 // Game-related State data
 SpriteRenderer  *Renderer;
 GameObject      *Player;
-
-/*
-const glm::vec2 PLAYER_SIZE(100, 20);
-const GLfloat PLAYER_VELOCITY(500.0f);
-*/
+BallObject      *Ball;
 
 Game::Game(GLuint width, GLuint height) 
 	: State(GAME_ACTIVE), Keys(), Width(width), Height(height) 
@@ -31,6 +27,7 @@ Game::~Game()
 {
     delete Renderer;
     delete Player;
+	delete Ball;
 }
 
 void Game::Init()
@@ -42,7 +39,7 @@ void Game::Init()
     ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
     ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
     // Load Texture
-    //ResourceManager::LoadTexture("Texture/awesomeface.png", GL_TRUE, "face");
+    ResourceManager::LoadTexture("Texture/awesomeface.png", GL_TRUE, "face");
     ResourceManager::LoadTexture("Texture/background.jpg", GL_TRUE, "background");
     ResourceManager::LoadTexture("Texture/block.png", GL_TRUE, "block");
     ResourceManager::LoadTexture("Texture/block_solid.png", GL_TRUE, "block_solid");
@@ -65,7 +62,11 @@ void Game::Init()
     // Configure game objects
     glm::vec2 playerPos = glm::vec2(this->Width / 2 - PLAYER_SIZE.x / 2, this->Height - PLAYER_SIZE.y);
     Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+
+	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2 - BALL_RADIUS, -BALL_RADIUS * 2);
+	Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY,ResourceManager::GetTexture("face"));
 }
+
 void Game::Render()
 {
     if (this->State == GAME_ACTIVE)
@@ -77,13 +78,15 @@ void Game::Render()
         this->Levels[this->Level].Draw(*Renderer);
         // Draw player
         Player->Draw(*Renderer);
+		Ball->Draw(*Renderer);
     }
 }
 
 
 void Game::Update(GLfloat dt)
 {
-    
+	Ball->Move(dt, this->Width);
+	this->DoCollisions();
 }
 
 void Game::ProcessInput(GLfloat dt)
@@ -102,5 +105,29 @@ void Game::ProcessInput(GLfloat dt)
             if (Player->Position.x <= this->Width - Player->Size.x)
                 Player->Position.x += velocity;
         }
+		if (this->Keys[GLFW_KEY_SPACE])
+			Ball->Stuck = false;
     }
+}
+
+GLboolean ChekCollision(GameObject &one, GameObject &two)
+{
+	bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
+		two.Position.x + two.Size.x >= one.Position.x;
+	bool collisionY = one.Position.y + one.Size.y >= two.Position.y &&
+		two.Position.y + two.Size.y >= one.Position.y;
+	return collisionX && collisionY;
+}
+
+void Game::DoCollisions()
+{
+	for (GameObject &box : this->Levels[this->Level].Bricks)
+	{
+		if (!box.Destroyed)
+		{
+			if (ChekCollision(*Ball, box))
+				if(!box.IsSolid)
+					box.Destroyed = GL_TRUE;
+		}
+	}
 }
