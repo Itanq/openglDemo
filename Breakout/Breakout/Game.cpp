@@ -110,6 +110,7 @@ void Game::ProcessInput(GLfloat dt)
     }
 }
 
+// AABB-AABB Åö×²¼ì²âËã·¨
 GLboolean ChekCollision(GameObject &one, GameObject &two)
 {
 	bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
@@ -119,6 +120,21 @@ GLboolean ChekCollision(GameObject &one, GameObject &two)
 	return collisionX && collisionY;
 }
 
+// AABB-Cirlc Åö×²¼ì²âËã·¨
+GLboolean CheckCollisions(BallObject &one, GameObject two)
+{
+	glm::vec2 center(one.Position + one.Radius);
+	glm::vec2 aabb_half_extens(two.Size.x / 2, two.Size.y / 2);
+	glm::vec2 aabb_center(
+		two.Position.x + aabb_half_extens.x,
+		two.Position.y + aabb_half_extens.y
+	);
+	glm::vec2 difference = center - aabb_center;
+	glm::vec2 clamped = glm::clamp(difference, -aabb_half_extens, aabb_half_extens);
+	glm::vec2 closest = aabb_center + clamped;
+	difference = closest - center;
+	return glm::length(difference) < one.Radius;
+}
 void Game::DoCollisions()
 {
 	for (GameObject &box : this->Levels[this->Level].Bricks)
