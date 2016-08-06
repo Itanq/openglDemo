@@ -1,72 +1,72 @@
-/*******************************************************************
-** This code is part of Breakout.
-**
-** Breakout is free software: you can redistribute it and/or modify
-** it under the terms of the CC BY 4.0 license as published by
-** Creative Commons, either version 4 of the License, or (at your
-** option) any later version.
-******************************************************************/
-#ifndef GAME_H
-#define GAME_H
+
+#pragma once
+
 #include <vector>
 #include <tuple>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "gameobject.h"
 #include "gamelevel.h"
+#include "powerup.h"
 
-// Represents the current state of the game
+// 游戏当前转态
 enum GameState {
     GAME_ACTIVE,
     GAME_MENU,
     GAME_WIN
 };
 
-// Represents the four possible (collision) directions
+// 方向
 enum Direction {
     UP,
     RIGHT,
     DOWN,
     LEFT
 };
-// Defines a Collision typedef that represents collision data
-typedef std::tuple<GLboolean, Direction, glm::vec2> Collision; // <collision?, what direction?, difference vector center - closest point>
 
-// Initial size of the player paddle
+// 用于碰撞检测的碰撞数据类型
+typedef std::tuple<GLboolean, Direction, glm::vec2> Collision;
+
+// 初始化玩家大小
 const glm::vec2 PLAYER_SIZE(100, 20);
-// Initial velocity of the player paddle
+
+// 初始化玩家移动的速度
 const GLfloat PLAYER_VELOCITY(500.0f);
-// Initial velocity of the Ball
+
+// 初始化球的速度
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
-// Radius of the ball object
+
+// 球的半径
 const GLfloat BALL_RADIUS = 12.5f;
 
-// Game holds all game-related state and functionality.
-// Combines all game-related data into a single class for
-// easy access to each of the components and manageability.
 class Game
 {
 public:
-    // Game state
+	// 数据区
     GameState              State;	
     GLboolean              Keys[1024];
+    GLboolean              KeysProcessed[1024];
     GLuint                 Width, Height;
     std::vector<GameLevel> Levels;
+    std::vector<PowerUp>   PowerUps;
     GLuint                 Level;
-    // Constructor/Destructor
+    GLuint                 Lives;
+
+	// 方法区
     Game(GLuint width, GLuint height);
     ~Game();
-    // Initialize game state (load all shaders/textures/levels)
+    // 初始化游戏的数据(shaders/textures/levels)
     void Init();
-    // GameLoop
     void ProcessInput(GLfloat dt);
     void Update(GLfloat dt);
     void Render();
     void DoCollisions();
-    // Reset
+    // 游戏重置函数
     void ResetLevel();
     void ResetPlayer();
+    // 木板
+    void SpawnPowerUps(GameObject &block);
+    void UpdatePowerUps(GLfloat dt);
 };
-
-#endif
