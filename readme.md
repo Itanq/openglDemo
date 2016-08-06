@@ -7,7 +7,7 @@ breakout是一个2D游戏项目.
 
 采用OpenGL实现.
 
-[详情](https://github.com/Itanq/openglDemo/tree/master/Breakout/Breakout)
+[详情](https://github.com/Itanq/openglDemo/tree/master/Breakout)
 
 
 ## digitClock
