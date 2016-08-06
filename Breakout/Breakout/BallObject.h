@@ -1,3 +1,6 @@
+/*
+	球对象的类
+*/
 #pragma once
 
 #include"gameobject.h"
@@ -7,6 +10,7 @@ class BallObject :public GameObject
 public:
 	GLfloat Radius;
 	GLboolean Stuck;
+	GLboolean Sticky, PassThrough;
 
 	BallObject();
 	BallObject(glm::vec2 pos, GLfloat raidus, glm::vec2 velocity, Texture2D sprite);

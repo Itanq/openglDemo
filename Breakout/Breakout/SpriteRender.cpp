@@ -1,12 +1,8 @@
 
-/*******************************************************************
-** This code is part of Breakout.
-**
-** Breakout is free software: you can redistribute it and/or modify
-** it under the terms of the CC BY 4.0 license as published by
-** Creative Commons, either version 4 of the License, or (at your
-** option) any later version.
-******************************************************************/
+/*
+	渲染系统的实现方法
+*/
+
 #include"shader.h"
 #include "spriterenderer.h"
 
@@ -24,12 +20,11 @@ SpriteRenderer::~SpriteRenderer()
 
 void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec2 size, GLfloat rotate, glm::vec3 color)
 {
-    // Prepare transformations
     this->shader.Use();
     glm::mat4 model;
-    model = glm::translate(model, glm::vec3(position, 0.0f));  // First translate (transformations are: scale happens first, then rotation and then finall translation happens; reversed order)
+    model = glm::translate(model, glm::vec3(position, 0.0f));  // First translate
 
-    model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); // Move origin of rotation to center of quad
+    model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); // Move origin
     model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 1.0f)); // Then rotate
     model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f)); // Move origin back
 
@@ -50,7 +45,6 @@ void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec
 
 void SpriteRenderer::initRenderData()
 {
-    // Configure VAO/VBO
     GLuint VBO;
     GLfloat vertices[] = { 
         // Pos      // Tex

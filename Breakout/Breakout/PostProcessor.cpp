@@ -1,11 +1,7 @@
-/*******************************************************************
-** This code is part of Breakout.
-**
-** Breakout is free software: you can redistribute it and/or modify
-** it under the terms of the CC BY 4.0 license as published by
-** Creative Commons, either version 4 of the License, or (at your
-** option) any later version.
-******************************************************************/
+/*
+	后效果库文件的实现
+*/
+
 #include "postprocessor.h"
 
 #include <iostream>
@@ -18,23 +14,22 @@ PostProcessor::PostProcessor(Shader shader, GLuint width, GLuint height)
 	glGenFramebuffers(1, &this->FBO);
 	glGenRenderbuffers(1, &this->RBO);
 
-	// Initialize renderbuffer storage with a multisampled color buffer (don't need a depth/stencil buffer)
+	// Initialize renderbuffer storage
 	glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, this->RBO);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGB, width, height); // Allocate storage for render buffer object
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, this->RBO); // Attach MS render buffer object to framebuffer
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGB, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, this->RBO);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::POSTPROCESSOR: Failed to initialize MSFBO" << std::endl;
 
-	// Also initialize the FBO/texture to blit multisampled color-buffer to; used for shader operations (for postprocessing effects)
+	// initialize FBO/texture
 	glBindFramebuffer(GL_FRAMEBUFFER, this->FBO);
 	this->Texture.Generate(width, height, NULL);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->Texture.ID, 0); // Attach texture to framebuffer as its color attachment
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->Texture.ID, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::POSTPROCESSOR: Failed to initialize FBO" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Initialize render data and uniforms
 	this->initRenderData();
 	this->PostProcessingShader.SetInteger("scene", 0, GL_TRUE);
 	GLfloat offset = 1.0f / 300.0f;
@@ -72,11 +67,10 @@ void PostProcessor::BeginRender()
 }
 void PostProcessor::EndRender()
 {
-	// Now resolve multisampled color-buffer into intermediate FBO to store to texture
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->MSFBO);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->FBO);
 	glBlitFramebuffer(0, 0, this->Width, this->Height, 0, 0, this->Width, this->Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // Binds both READ and WRITE framebuffer to default framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void PostProcessor::Render(GLfloat time)

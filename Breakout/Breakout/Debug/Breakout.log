@@ -1,12 +1,31 @@
-﻿  Game.cpp
-e:\opengldemo\breakout\breakout\game.cpp(53): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(54): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(55): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(56): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(89): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(91): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(93): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-e:\opengldemo\breakout\breakout\game.cpp(95): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+﻿  Texture2D.cpp
+  TextRenderer.cpp
+e:\opengldemo\breakout\breakout\textrenderer.cpp(74): warning C4838: 从“FT_Pos”转换到“GLuint”需要收缩转换
+  SpriteRender.cpp
+  Shader.cpp
+  ResourceManager.cpp
+  PostProcessor.cpp
+  ParticleGenerator.cpp
+e:\opengldemo\breakout\breakout\particlegenerator.cpp(28): warning C4244: “-=”: 从“double”转换到“float”，可能丢失数据
+e:\opengldemo\breakout\breakout\particlegenerator.cpp(103): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+  main.cpp
+e:\opengldemo\breakout\breakout\main.cpp(57): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+  GameObject.cpp
+  GameLevel.cpp
+e:\opengldemo\breakout\breakout\gamelevel.cpp(53): warning C4244: “初始化”: 从“GLuint”转换到“GLfloat”，可能丢失数据
+  Game.cpp
+e:\opengldemo\breakout\breakout\game.cpp(84): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(85): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(86): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(87): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(234): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(240): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(247): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(249): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(251): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+e:\opengldemo\breakout\breakout\game.cpp(253): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+  BallObject.cpp
+  正在生成代码...
   SOIL.lib(SOIL.obj) : 找到 MSIL .netmodule 或使用 /GL 编译的模块；正在使用 /LTCG 重新启动链接；将 /LTCG 添加到链接命令行以改进链接器性能
 LINK : warning LNK4075: 忽略“/INCREMENTAL”(由于“/LTCG”规范)
 BallObject.obj : warning LNK4075: 忽略“/EDITANDCONTINUE”(由于“/OPT:LBR”规范)

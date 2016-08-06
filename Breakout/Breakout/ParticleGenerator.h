@@ -1,3 +1,8 @@
+
+/*
+	粒子系统 - 粒子生成器的类
+*/
+
 #pragma once
 
 #include<vector>

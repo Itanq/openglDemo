@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;glfw3dll.lib;SOIL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glfw3.lib;glfw3dll.lib;SOIL.lib;opengl32.lib;irrklang.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -154,9 +154,12 @@
     <ClCompile Include="GameLevel.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ParticleGenerator.cpp" />
+    <ClCompile Include="PostProcessor.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpriteRender.cpp" />
+    <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Texture2D.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,9 +167,13 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameLevel.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="ParticleGenerator.h" />
+    <ClInclude Include="PostProcessor.h" />
+    <ClInclude Include="PowerUp.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="Texture2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

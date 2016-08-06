@@ -1,3 +1,6 @@
+/*
+	着色器的实现方法
+*/
 
 #include<string>
 #include<iostream>

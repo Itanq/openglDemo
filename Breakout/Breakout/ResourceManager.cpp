@@ -1,4 +1,7 @@
 
+/*
+	数据管理类的实现方法
+*/
 
 #include<map>
 #include<string>
@@ -9,7 +12,6 @@
 
 #include "ResourceManager.h"
 
-// Instantiate static variables
 std::map<std::string, Texture2D>    ResourceManager::Textures;
 std::map<std::string, Shader>       ResourceManager::Shaders;
 
@@ -38,10 +40,8 @@ Texture2D ResourceManager::GetTexture(std::string name)
 
 void ResourceManager::Clear()
 {
-    // (Properly) delete all shaders	
     for (auto iter : Shaders)
         glDeleteProgram(iter.second.ID);
-    // (Properly) delete all textures
     for (auto iter : Textures)
         glDeleteTextures(1, &iter.second.ID);
 }
@@ -95,7 +95,6 @@ Shader ResourceManager::loadShaderFromFile(const GLchar *vShaderFile, const GLch
 
 Texture2D ResourceManager::loadTextureFromFile(const GLchar *file, GLboolean alpha)
 {
-    // Create Texture object
     Texture2D texture;
     if (alpha)
     {
@@ -105,9 +104,8 @@ Texture2D ResourceManager::loadTextureFromFile(const GLchar *file, GLboolean alp
     // Load image
     int width, height;
     unsigned char* image = SOIL_load_image(file, &width, &height, 0, texture.Image_Format == GL_RGBA ? SOIL_LOAD_RGBA : SOIL_LOAD_RGB);
-    // Now generate texture
+    // generate texture
     texture.Generate(width, height, image);
-    // And finally free image data
     SOIL_free_image_data(image);
     return texture;
 }

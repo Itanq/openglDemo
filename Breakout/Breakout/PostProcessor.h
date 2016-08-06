@@ -1,3 +1,7 @@
+
+/*
+	后效果实现的库
+*/
 #pragma once
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -16,19 +20,14 @@ public:
     GLuint Width, Height;
     // Options
     GLboolean Confuse, Chaos, Shake;
-    // Constructor
     PostProcessor(Shader shader, GLuint width, GLuint height);
-    // Prepares the postprocessor's framebuffer operations before rendering the game
     void BeginRender();
-    // Should be called after rendering the game, so it stores all the rendered data into a texture object
     void EndRender();
-    // Renders the PostProcessor texture quad (as a screen-encompassing large sprite)
     void Render(GLfloat time);
 private:
     // Render state
-    GLuint MSFBO, FBO; // MSFBO = Multisampled FBO. FBO is regular, used for blitting MS color-buffer to texture
-    GLuint RBO; // RBO is used for multisampled color buffer
+    GLuint MSFBO, FBO;
+    GLuint RBO;
     GLuint VAO;
-    // Initialize quad for rendering postprocessing texture
     void initRenderData();
 };
