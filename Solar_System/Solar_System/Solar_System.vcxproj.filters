@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="stars.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader.h">
@@ -26,7 +29,7 @@
     <ClInclude Include="camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="solarSystem.h">
+    <ClInclude Include="stars.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

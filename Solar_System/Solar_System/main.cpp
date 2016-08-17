@@ -11,20 +11,18 @@
 
 #include "shader.h"
 #include "camera.h"
+#include"stars.h"
 
-#define PI 3.14159267
 
 typedef GLint Int;
 typedef GLuint Uint;
 typedef GLchar Char;
 typedef GLfloat Float;
 
+
 Uint WIDTH = 800, HEIGHT = 600;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
 GLfloat sphereData[8024];
-GLfloat circleData[2048];
 
 char keys[1024];
 GLboolean firstMouse = true;
@@ -34,43 +32,53 @@ GLfloat lastX=400,lastY=300;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
-void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (action == GLFW_PRESS)
-		keys[key] = GL_TRUE;
-	else if(action==GLFW_RELEASE)
-		keys[key] = GL_FALSE;
-}
 void Domovement()
 {
-	if (keys[GLFW_KEY_W])
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (keys[GLFW_KEY_S])
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (keys[GLFW_KEY_A])
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (keys[GLFW_KEY_D])
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+    // Camera controls
+    if(keys[GLFW_KEY_W])
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if(keys[GLFW_KEY_S])
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if(keys[GLFW_KEY_A])
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if(keys[GLFW_KEY_D])
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+
+}
+void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+
+    if(action == GLFW_PRESS)
+        keys[key] = true;
+	else if (action == GLFW_RELEASE)
+	{
+		keys[key] = false;
+	}
+
 }
 void mousecallback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-	GLfloat xoffset = xpos - lastX;
-	GLfloat yoffset = lastY - ypos;
-	camera.ProcessMouseMovement(xoffset, yoffset);
-}
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos; 
+    
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}	
 void scrollcallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera.ProcessMouseScroll(xoffset);
+    camera.ProcessMouseScroll(yoffset);
 }
-
 GLuint loadTexture(const char* path)
 {
 	GLuint textureID;
@@ -87,7 +95,7 @@ GLuint loadTexture(const char* path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return textureID;
 }
-GLFWwindow* InitWindow()
+GLFWwindow* myCreateWindow()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
@@ -95,13 +103,12 @@ GLFWwindow* InitWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "BasicLighting", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "SolarSystem", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	glfwSetKeyCallback(window, keyboard);
-	//glfwSetCursorPosCallback(window, mousecallback);
+	glfwSetCursorPosCallback(window, mousecallback);
 	glfwSetScrollCallback(window, scrollcallback);
-
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glewExperimental = GL_TRUE;
@@ -113,8 +120,6 @@ GLFWwindow* InitWindow()
 
 	return window;
 }
-
-
 int GenerateSphere()
 {
 	int index = 0;
@@ -153,67 +158,50 @@ int GenerateSphere()
 	}
 	return index;
 }
-
-int GenerateCircle()
-{
-	int index = 0;
-	GLfloat R = 0.75f;
-	for (int i = 0; i <= 360; ++i)
-	{
-		float u = i*(PI / 180.0f);
-		float x = R*cos(u);
-		float y = R*sin(u);
-		circleData[index++] = x;
-		circleData[index++] = y;
-		circleData[index++] = 0.0f;
-	}
-	return index;
-}
-
 int main()
 {
-	GLFWwindow* window = InitWindow();
+	GLFWwindow* window = myCreateWindow();
 
 	const char* sphereVertexPath = "./Shader/vertexShader.glsl";
 	const char* sphereFragmentPath = "./Shader/fragmentShader.glsl";
 
-	const char* circleVertexPath = "./Shader/circleVertexShader.glsl";
+	const char* trackVertexPath = "./Shader/trackVertexShader.glsl";
 
 	Shader sphereShader(sphereVertexPath, sphereFragmentPath);
-	Shader circleShader(circleVertexPath, sphereFragmentPath);
+	Shader trackShader(trackVertexPath, sphereFragmentPath);
 
 	int sphereCount = GenerateSphere(); // 球体
-	int circleCount = GenerateCircle(); // 圆
-
 	GLuint sphereVAO, sphereVBO;
 	glGenVertexArrays(1, &sphereVAO);
 	glGenBuffers(1, &sphereVBO);
-
 	glBindVertexArray(sphereVAO);
-	
 	glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sphereData), sphereData, GL_STATIC_DRAW);
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),(GLvoid*)0);
 	glEnableVertexAttribArray(0);
-
 	glBindVertexArray(0);
 
+	Star sun(sphereShader, trackShader, 0.0f);
+	sun.init(sphereVAO);
+	Star mercury(sphereShader, trackShader, 0.4f);
+	mercury.init(sphereVAO);
+	Star venus(sphereShader, trackShader, 0.7f);
+	venus.init(sphereVAO);
+	Star earth(sphereShader, trackShader, 0.95f);
+	earth.init(sphereVAO);
+	Star moon(sphereShader, trackShader, 0.65f);
+	moon.init(sphereVAO);
 
-	GLuint circleVAO,circleVBO;
-	glGenVertexArrays(1, &circleVAO);
-	glGenBuffers(1, &circleVBO);
-	glBindVertexArray(circleVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, circleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(circleData), circleData, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
-
-	GLuint texture = loadTexture("metal.png");
+	Star mars(sphereShader, trackShader, 1.5f);
+	mars.init(sphereVAO);
+	Star jupiter(sphereShader, trackShader, 1.78f);
+	jupiter.init(sphereVAO);
+	Star saturn(sphereShader, trackShader, 2.25f);
+	saturn.init(sphereVAO);
+	Star uranus(sphereShader, trackShader, 2.65f);
+	uranus.init(sphereVAO);
+	Star neptune(sphereShader, trackShader, 2.45f);
+	neptune.init(sphereVAO);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -223,55 +211,44 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		circleShader.Use();
-
-		glBindVertexArray(circleVAO);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glDrawArrays(GL_LINES, 0, circleCount);
-		glBindVertexArray(0);
-
-		
+		trackShader.Use();
 		sphereShader.Use();
 
-		glm::mat4 model, view, projection;
+		sun.setStar(glm::vec3(0.7f), 45.0f, 0.0f);
+		sun.drawStar(sphereCount);
 
-		glBindVertexArray(sphereVAO);
+		mercury.setStar(glm::vec3(0.11f), 45.0f, 8.0f);
+		mercury.drawStar(sphereCount);
 
-		model = glm::mat4();
-		view = glm::mat4();
-		projection = glm::mat4();
-		model = glm::scale(model, glm::vec3(0.45f));
-		model = glm::rotate(model, (GLfloat)glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, (GLfloat)glm::radians(glfwGetTime()*45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		venus.setStar(glm::vec3(0.20f), 45.0f, 5.0f);
+		venus.drawStar(sphereCount);
 
-		glDrawArrays(GL_LINES, 0, sphereCount);
+		earth.setStar(glm::vec3(0.25f), 45.0f, 1.0f);
+		earth.drawStar(sphereCount);
+
+		moon.setStar(glm::vec3(0.10f), 45.0f, 1.0f, GL_FALSE);
+		moon.drawStar(sphereCount);
+
+		mars.setStar(glm::vec3(0.15f), 45.0f, 0.90f);
+		mars.drawStar(sphereCount);
+
+		jupiter.setStar(glm::vec3(0.35f), 45.0f, 0.78f);
+		jupiter.drawStar(sphereCount);
 
 
-		model = glm::mat4();
+		saturn.setStar(glm::vec3(0.32f), 45.0f, 0.55f);
+		saturn.drawStar(sphereCount);
 
-		GLfloat r = 0.85f;
-		GLfloat x = (GLfloat)cos(glfwGetTime())*r;
-		GLfloat y = (GLfloat)sin(glfwGetTime())*r;
+		uranus.setStar(glm::vec3(0.31f), 45.0f, 0.35f);
+		uranus.drawStar(sphereCount);
 
-		model = glm::translate(model, glm::vec3(x, y, 0.0f));
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		model = glm::rotate(model, (GLfloat)glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, (GLfloat)glm::radians(glfwGetTime()*65.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-		view = camera.GetViewMatrix();
-		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-		projection = glm::mat4();
-		projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
-		glUniformMatrix4fv(glGetUniformLocation(sphereShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-		glDrawArrays(GL_LINES, 0, sphereCount);
-		
-		glBindVertexArray(0);
+		neptune.setStar(glm::vec3(0.31f), 45.0f, 0.15f);
+		neptune.drawStar(sphereCount);
 
 		glfwSwapBuffers(window);
+
 	}
 	glfwTerminate();
 	return 0;
 }
+
